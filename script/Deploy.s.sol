@@ -9,17 +9,26 @@ import {ProviderRegistry} from "../src/ProviderRegistry.sol";
 
 /// Testnet and Anvil only. Reads addresses from the environment (see .env.example).
 /// Anvil (chain 31337) deploys MockUSDC. Otherwise USDC_ADDRESS is used.
+/// Only DEPLOYER_PRIVATE_KEY is needed on the deploy machine. For the coordinator, arbiter and verifiers the
+/// script takes an address (COORDINATOR_ADDRESS, ARBITER_ADDRESS, VERIFIER_1_ADDRESS ...) and falls back to the
+/// address of the matching *_PRIVATE_KEY only when the address variable is unset.
 contract Deploy is Script {
+    function _role(string memory addressName, string memory keyName) internal view returns (address) {
+        address given = vm.envOr(addressName, address(0));
+        if (given != address(0)) return given;
+        return vm.addr(vm.envUint(keyName));
+    }
+
     function run() external {
         uint256 deployerKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
         address deployer = vm.addr(deployerKey);
-        address coordinator = vm.addr(vm.envUint("COORDINATOR_PRIVATE_KEY"));
-        address arbiter = vm.addr(vm.envUint("ARBITER_PRIVATE_KEY"));
+        address coordinator = _role("COORDINATOR_ADDRESS", "COORDINATOR_PRIVATE_KEY");
+        address arbiter = _role("ARBITER_ADDRESS", "ARBITER_PRIVATE_KEY");
 
         address[] memory verifiers = new address[](3);
-        verifiers[0] = vm.addr(vm.envUint("VERIFIER_1_PRIVATE_KEY"));
-        verifiers[1] = vm.addr(vm.envUint("VERIFIER_2_PRIVATE_KEY"));
-        verifiers[2] = vm.addr(vm.envUint("VERIFIER_3_PRIVATE_KEY"));
+        verifiers[0] = _role("VERIFIER_1_ADDRESS", "VERIFIER_1_PRIVATE_KEY");
+        verifiers[1] = _role("VERIFIER_2_ADDRESS", "VERIFIER_2_PRIVATE_KEY");
+        verifiers[2] = _role("VERIFIER_3_ADDRESS", "VERIFIER_3_PRIVATE_KEY");
 
         uint256 quorum = vm.envOr("VERIFIER_QUORUM", uint256(2));
         uint256 bond = vm.envOr("DISPUTE_BOND", uint256(1_000_000));

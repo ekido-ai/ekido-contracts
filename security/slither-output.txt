@@ -1,0 +1,36 @@
+INFO:Detectors:
+Detector: uninitialized-local
+GPUChainEscrow._applyVerdict(bytes32,GPUChainEscrow.Job).paid (src/GPUChainEscrow.sol#369) is a local variable never initialized
+GPUChainEscrow._checkSignatures(bytes32,bytes[],uint32).previous (src/GPUChainEscrow.sol#359) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+INFO:Detectors:
+Detector: timestamp
+GPUChainEscrow.createJob(bytes32,bytes32,bytes32,uint256,uint64,uint64) (src/GPUChainEscrow.sol#145-171) uses timestamp for comparisons
+	Dangerous comparisons:
+	- deadline <= block.timestamp (src/GPUChainEscrow.sol#156)
+GPUChainEscrow.dispute(bytes32) (src/GPUChainEscrow.sol#183-197) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= job.disputeEnd (src/GPUChainEscrow.sol#189-190)
+GPUChainEscrow.markActive(bytes32) (src/GPUChainEscrow.sol#201-210) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= job.deadline (src/GPUChainEscrow.sol#207-208)
+GPUChainEscrow.submitAttestation(GPUChainEscrow.Verdict,bytes[]) (src/GPUChainEscrow.sol#224-249) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > verdict.expiry (src/GPUChainEscrow.sol#227-228)
+GPUChainEscrow.finalize(bytes32) (src/GPUChainEscrow.sol#251-257) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < job.disputeEnd (src/GPUChainEscrow.sol#253-256)
+GPUChainEscrow.finalizeAfterArbiterTimeout(bytes32) (src/GPUChainEscrow.sol#280-286) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < job.disputedAt + ARBITER_TIMEOUT (src/GPUChainEscrow.sol#285)
+GPUChainEscrow.claimTimeoutRefund(bytes32) (src/GPUChainEscrow.sol#288-297) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < job.deadline + REFUND_GRACE (src/GPUChainEscrow.sol#294)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Detector: unindexed-event-address
+Event GPUChainEscrow.CoordinatorUpdated(address) (src/GPUChainEscrow.sol#98-99) has address parameters but no indexed parameters
+Event GPUChainEscrow.ArbiterUpdated(address) (src/GPUChainEscrow.sol#99) has address parameters but no indexed parameters
+Event ProviderRegistry.CoordinatorUpdated(address) (src/ProviderRegistry.sol#22) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Slither:. analyzed (27 contracts with 102 detectors), 12 result(s) found
