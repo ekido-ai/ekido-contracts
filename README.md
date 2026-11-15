@@ -5,7 +5,7 @@
 ## What the escrow does
 
 - `createJob` locks the client's USDC budget with a deadline and a dispute window.
-- `submitAttestation` records a verdict that carries enough verifier signatures. The payouts and the refund must add up to the budget exactly. Each provider's amount (per accepted step) and the protocol fee are computed off-chain in `packages/gpuchain_core` and arrive as payees in the verdict; a refused job has no payees, so no fee is taken on it.
+- `submitAttestation` records a verdict that carries enough verifier signatures. The payouts and the refund must add up to the budget exactly. Each provider's amount (per accepted step) and the protocol fee are computed off-chain in `packages/ekido_core` and arrive as payees in the verdict; a refused job has no payees, so no fee is taken on it.
 - `finalize` credits each payee and refunds the rest to the client once the dispute window closes. Everyone withdraws their own balance (`withdraw`).
 - `markActive` refuses a job whose deadline has passed, and `claimTimeoutRefund` lets anyone refund the client an hour after the deadline.
 
@@ -42,7 +42,7 @@ forge script script/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
 
 **Base Sepolia has not been deployed yet.** It needs the team lead's go-ahead, test ETH in the deployer and coordinator wallets, and the testnet-only keys in an uncommitted `.env`. Never commit keys; `broadcast/` is ignored.
 
-Only `DEPLOYER_PRIVATE_KEY` needs to be on the deploy machine. For the coordinator, arbiter and verifiers the script takes `COORDINATOR_ADDRESS`, `ARBITER_ADDRESS` and `VERIFIER_1_ADDRESS` to `VERIFIER_3_ADDRESS`, and falls back to the address of the matching `*_PRIVATE_KEY` only when the address variable is unset, so the earlier way of running it still works. This is a change from the script in the earlier GPUChain project. I could not run `forge` here: CI compiles it, but nobody has run this version on Anvil yet.
+Only `DEPLOYER_PRIVATE_KEY` needs to be on the deploy machine. For the coordinator, arbiter and verifiers the script takes `COORDINATOR_ADDRESS`, `ARBITER_ADDRESS` and `VERIFIER_1_ADDRESS` to `VERIFIER_3_ADDRESS`, and falls back to the address of the matching `*_PRIVATE_KEY` only when the address variable is unset, so the earlier way of running it still works. This is a change from the script in the earlier Ekido project. I could not run `forge` here: CI compiles it, but nobody has run this version on Anvil yet.
 
 ## ProviderRegistry
 
@@ -56,7 +56,7 @@ The registry does not hold worker keys. Enrolling them is the coordinator's job,
 
 | Rule | Where the coordinator enforces it | Test |
 |---|---|---|
-| The dispute window is at least one hour on a public chain. A shorter one is allowed only on the explicitly configured local chain (31337) | `MIN_PUBLIC_DISPUTE_WINDOW_SECONDS` in `SettlementService.require_funded`, `apps/coordinator/gpuchain_coordinator/settlement_service.py` | `apps/coordinator/tests/test_dispute_window_guard.py` |
+| The dispute window is at least one hour on a public chain. A shorter one is allowed only on the explicitly configured local chain (31337) | `MIN_PUBLIC_DISPUTE_WINDOW_SECONDS` in `SettlementService.require_funded`, `apps/coordinator/ekido_coordinator/settlement_service.py` | `apps/coordinator/tests/test_dispute_window_guard.py` |
 | The on-chain deadline is not earlier than the job's agreed deadline (60 seconds of clock tolerance), so a client can't take a refund while work is still running | `DEADLINE_TOLERANCE_SECONDS` in `SettlementService.require_funded` | `apps/coordinator/tests/test_deadline_guard.py` |
 | A verdict within 10 minutes of its expiry is rebuilt and signed again instead of submitted | `MIN_SUBMIT_LEAD_SECONDS` in `settlement_service.py` | `test_a_verdict_near_expiry_is_rebuilt_not_submitted` in `apps/coordinator/tests/test_settlement_recovery.py` |
 
@@ -81,7 +81,7 @@ What this does not cover: a client who calls the contract directly, without the 
 | `GPUChainEscrow` | `0x1BF65f755457a92850009c88AFb337Ec57745a22` |
 | `ProviderRegistry` | `0xcdf927CE0D885552529C5463993e64429a51c2Ff` |
 
-These were deployed from the earlier GPUChain repository and are what `https://gpuchain.duckdns.org` uses. This repository has not deployed anything.
+These were deployed from the earlier Ekido repository and are what `https://gpuchain.duckdns.org` uses. This repository has not deployed anything.
 
 On 14 Nov 2026 the code on chain was compared with what this repository compiles to (`infra/verify_deployed_contracts.py`, forge 1.9.0, forge-std v1.17.0, OpenZeppelin v5.7.0). The raw output is `experiments/results/deployment_check_20261114.txt`.
 
