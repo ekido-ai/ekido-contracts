@@ -24,7 +24,7 @@ jobs:
       - name: Fetch the shared test vectors from ekido-core (pinned)
         run: |
           mkdir -p ../docs/schemas/vectors
-          curl -fsSL https://raw.githubusercontent.com/ekido-ai/Ekido/v0.4.0/docs/schemas/vectors/verdict_vector.json -o ../docs/schemas/vectors/verdict_vector.json
+          curl -fsSL https://raw.githubusercontent.com/ekido-ai/ekido-core/v0.4.0/docs/schemas/vectors/verdict_vector.json -o ../docs/schemas/vectors/verdict_vector.json
       - run: forge test
 
   slither:
