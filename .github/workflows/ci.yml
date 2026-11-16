@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    name: Contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1
+      - name: Fetch libraries
+        run: |
+          git clone --depth 1 --branch v1.17.0 https://github.com/foundry-rs/forge-std lib/forge-std
+          git clone --depth 1 --branch v5.7.0 https://github.com/OpenZeppelin/openzeppelin-contracts lib/openzeppelin-contracts
+      - run: forge build --sizes
+      - name: Fetch the shared test vectors from ekido-core (pinned)
+        run: |
+          mkdir -p ../docs/schemas/vectors
+          curl -fsSL https://raw.githubusercontent.com/ekido-ai/Ekido/v0.4.0/docs/schemas/vectors/verdict_vector.json -o ../docs/schemas/vectors/verdict_vector.json
+      - run: forge test
+
+  slither:
+    name: Slither
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1
+      - name: Fetch libraries
+        run: |
+          git clone --depth 1 --branch v1.17.0 https://github.com/foundry-rs/forge-std lib/forge-std
+          git clone --depth 1 --branch v5.7.0 https://github.com/OpenZeppelin/openzeppelin-contracts lib/openzeppelin-contracts
+      - run: pip install slither-analyzer==0.11.6
+      - name: Run Slither
+        run: slither . --filter-paths "lib/|test/|script/" --json slither.json || true
+      # Fails on any High or Medium result except the triaged false positives in security/slither-report.md.
+      - name: Fail on new Medium or High results
+        run: python security/check_slither.py slither.json
