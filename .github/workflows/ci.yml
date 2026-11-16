@@ -21,6 +21,10 @@ jobs:
           git clone --depth 1 --branch v1.17.0 https://github.com/foundry-rs/forge-std lib/forge-std
           git clone --depth 1 --branch v5.7.0 https://github.com/OpenZeppelin/openzeppelin-contracts lib/openzeppelin-contracts
       - run: forge build --sizes
+      - name: Fetch the shared test vectors from ekido-core (pinned)
+        run: |
+          mkdir -p ../docs/schemas/vectors
+          curl -fsSL https://raw.githubusercontent.com/ekido-ai/Ekido/v0.4.0/docs/schemas/vectors/verdict_vector.json -o ../docs/schemas/vectors/verdict_vector.json
       - run: forge test
 
   slither:
