@@ -96,8 +96,11 @@ What this does not cover: a client who calls the contract directly, without the 
 |---|---|
 | `GPUChainEscrow` | `0x1BF65f755457a92850009c88AFb337Ec57745a22` |
 | `ProviderRegistry` | `0xcdf927CE0D885552529C5463993e64429a51c2Ff` |
+| `ProofAnchor` | `0x106Fca32CCf05Dd965B1274E9F2D3B650dDE7115` |
 
-These were deployed from the earlier Ekido repository and are what `https://gpuchain.duckdns.org` uses. This repository has not deployed anything.
+`GPUChainEscrow` and `ProviderRegistry` were deployed from the earlier Ekido repository and are what `https://gpuchain.duckdns.org` uses.
+
+`ProofAnchor` was deployed from this repository on 20 Nov 2026 with `script/DeployProofAnchor.s.sol` (forge, forge-std v1.17.0, OpenZeppelin v5.7.0). The deploy was transaction `0x83222cf4d67a3301e8dcfa95f5876273f54552b56b8bc61b99d43d2194e06ed8`, in block 61273608. Its owner is the team deployer `0x915f91f109980C5E810507feD50d5D364d15E074` (also the escrow's owner), and its coordinator is `0xF560cb62213ae6495A4dCbE75487352EE032B638` (the escrow's coordinator). Both were read back from the chain after the deploy. Nothing anchors to it yet: the coordinator side is ekido-coordinator #14.
 
 On 14 Nov 2026 the code on chain was compared with what this repository compiles to (`infra/verify_deployed_contracts.py`, forge 1.9.0, forge-std v1.17.0, OpenZeppelin v5.7.0). The raw output is `experiments/results/deployment_check_20261114.txt`.
 
